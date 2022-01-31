@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta name="description" content=""/>
+
+  <!-- Standard Google / Search engine tags -->
+  <meta itemprop="name" content=""/>
+  <meta itemprop="description" content=""/>
+  <meta itemprop="image" content="">
+
+  <!-- Facebook Meta Tags -->
+  <meta property="og:title" content="">
+  <meta property="og:url" content="">
+  <meta property="og:type" content="video">
+  <meta property="og:description" content="">
+  <meta property="og:image" content="">
+
+  <!-- Twitter Meta Tags -->
+  <meta name="twitter:title" content="">
+  <meta name="twitter:card" content="">
+  <meta name="twitter:description" content="">
+  <meta name="twitter:image" content="">
+
+  <title>Authoritive Inc. | Courses</title>
+</head>
+<body>
+  <style>
+    body{
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+    #video-container video,
+    #video-container iframe{
+      width: calc(100vw - 3px);
+      height: calc(100vh - 3px);
+      border: none;
+    }
+
+    #video-container{
+      overflow: hidden;
+    }
+  </style>
+  <div id="video-container"></div>
+  <script>
+    const urlSearchParams = new URLSearchParams(window.location.search);
+    const params          = Object.fromEntries(urlSearchParams.entries());
+
+    function youtube_id_parser(url){
+      let regExp  = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+      let match   = url.match(regExp);
+      return (match && match[7].length == 11) ? match[7] : false;
+    }
+
+    function vimeo_id_parser(url){
+      let regExp = /^.*(vimeo\.com\/)((channels\/[A-z]+\/)|(groups\/[A-z]+\/videos\/))?([0-9]+)/;
+      let match   = url.match(regExp);
+      return (match && match[5].length > 3) ? match[5] : false;
+    }
+
+    window.onload = function(){
+      const videoURL    = params.url;
+      const videoTitle  = params.title;
+      const videoThumb  = params.thumb;
+
+      if( typeof videoURL == 'undefined'){ return; }
+
+      document.querySelector('meta[property="og:url"]').setAttribute("content", videoURL);
+
+      if( videoTitle ){
+        document.title = videoTitle;
+        document.querySelector('meta[itemprop="name"]').setAttribute("content", videoTitle);
+        document.querySelector('meta[property="og:title"]').setAttribute("content", videoTitle);
+        document.querySelector('meta[name="twitter:title"]').setAttribute("content", videoTitle);
+      }      
+
+      if( videoThumb ){
+        document.querySelector('meta[itemprop="image"]').setAttribute("content", videoThumb);
+        document.querySelector('meta[property="og:image"]').setAttribute("content", videoThumb);
+        document.querySelector('meta[name="twitter:image"]').setAttribute("content", videoThumb);
+      }
+
+      if( videoURL.includes("youtube.com") || videoURL.includes("youtu.be") ){
+        // YouTube video
+        const youtubeVideoID = youtube_id_parser(videoURL);
+        console.log('YT ID:', youtubeVideoID);
+        document.querySelector("#video-container").innerHTML = `
+          <iframe src="https://www.youtube.com/embed/${youtubeVideoID}"></iframe>
+        `;
+      } else if (videoURL.includes("vimeo.com")) {
+        // Vimeo video
+        const vimeoVideoID = vimeo_id_parser(videoURL);
+        console.log('Vimeo ID:', vimeoVideoID);
+        document.querySelector("#video-container").innerHTML = `
+          <iframe src="https://player.vimeo.com/video/${vimeoVideoID}"></iframe>
+        `;
+      } else {
+        // Custom player
+        document.querySelector("#video-container").innerHTML = `
+          <video controls playsinline>
+            <source src="${videoURL}" type="video/mp4"/>
+          </video>
+        `;
+      }
+    }
+  </script>
+</body>
+</html>
