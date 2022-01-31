@@ -62,7 +62,7 @@
       return (match && match[5].length > 3) ? match[5] : false;
     }
 
-    window.onload = function(){
+    (function() {
       const videoURL    = params.url;
       const videoTitle  = params.title;
       const videoThumb  = params.thumb;
@@ -106,7 +106,7 @@
           </video>
         `;
       }
-    }
+    })();
   </script>
 </body>
 </html>
